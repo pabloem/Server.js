@@ -26,7 +26,8 @@
     "negotiate": "^1.0.1",
     "lodash": "^2.4.0",
     "lru-cache": "^2.5.0",
-    "uritemplate": "^0.3.0"
+    "uritemplate": "^0.3.0",
+    "bloomfilter": "0.0.14"
   },
   "optionalDependencies": {
     "hdt": "^1.1.0",
