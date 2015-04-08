@@ -225,6 +225,7 @@ describe('LinkedDataFragmentsServer', function () {
             url: root + '/my-datasource#dataset',
             templateUrl: root + '/my-datasource{?subject,predicate,object}',
           },
+          filterEnabled: false,
           fragment: {
             url:             root + '/my-datasource?a=b&c=d',
             pageUrl:         root + '/my-datasource?a=b&c=d',

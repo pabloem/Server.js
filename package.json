@@ -27,7 +27,7 @@
     "lodash": "^2.4.0",
     "lru-cache": "^2.5.0",
     "uritemplate": "^0.3.0",
-    "bloomfilter": "0.0.14"
+    "bloem": "0.2.4"
   },
   "optionalDependencies": {
     "hdt": "^1.1.0",
