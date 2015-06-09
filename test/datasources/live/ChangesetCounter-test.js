@@ -4,6 +4,24 @@ describe('ChangesetCounter', function() {
     describe('A ChangesetCounter instance', function() {
         var cc = new ChangesetCounter(),
             date = new Date();
+        it('if created with string, should build normally', function() {
+            var inputString = '2014/07/31/10/000123';
+            var cc1 = new ChangesetCounter(inputString);
+            cc1.getPath().should.equal(inputString);
+        });
+        it('if created with array, should build normally', function() {
+            var inputString = '2011/03/06/07/010122';
+            var inputArr = inputString.split("/").map(function(x){return parseInt(x);});
+            var cc1 = new ChangesetCounter(inputArr);
+            cc1.getPath().should.equal(inputString);
+        });
+        it('if created with dictionary, should build normally', function() {
+            var inputDict = {year:'1993',month:'12',count:'000201',hour:'23',day:'03'},
+                inputString = inputDict.year+'/'+inputDict.month+'/'+
+                    inputDict.day+'/'+inputDict.hour+'/'+inputDict.count;
+            var cc1 = new ChangesetCounter(inputDict);
+            cc1.getPath().should.equal(inputString);
+        });
         it('if created without arguments, it should be of the current time', function() {
             var nums = cc.getPath().split("/");
             date.getFullYear().should.equal(parseInt(nums[0]));
