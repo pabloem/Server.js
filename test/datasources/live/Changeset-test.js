@@ -7,9 +7,9 @@ describe('Changeset', function() {
         var cs = new Changeset();
         it('should parse an N-Triples formatted file',function() {
             cs._doneCallback = function() { 
-                (cs._triples.length).should.equal(8);
-                (cs._triples[7].predicate).should.equal('http://xmlns.com/foaf/0.1/name');
-                (cs._triples[7].object).should.equal('"Dave Beckett"');
+                (cs.triples.length).should.equal(8);
+                (cs.triples[7].predicate).should.equal('http://xmlns.com/foaf/0.1/name');
+                (cs.triples[7].object).should.equal('"Dave Beckett"');
                 };
             var content = asset('triples_file.nt');
             cs._fileContents = content;
