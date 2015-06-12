@@ -26,6 +26,9 @@
     "negotiate": "^1.0.1",
     "lodash": "^2.4.0",
     "lru-cache": "^2.5.0",
+    "levelup": "1.2.1",
+    "leveldown":"1.2.2",
+    "levelgraph": "1.0.0",
     "uritemplate": "^0.3.0",
     "htmlparser2": "^3.8.2",
     "zlib": "^1.0.5"
