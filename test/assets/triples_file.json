@@ -1,0 +1,14 @@
+[
+    {"subject":"<http://www.w3.org/2001/sw/RDFCore/ntriples/>",
+     "predicate":"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
+     "object":"<http://xmlns.com/foaf/0.1/Document>"},
+    {"subject":"<http://www.w3.org/2001/sw/RDFCore/ntriples/>",
+     "predicate":"<http://purl.org/dc/terms/title>",
+     "object":"\"N-Triples\"@en-US"},
+{"subject":"<http://www.w3.org/2001/sw/RDFCore/ntriples/>","predicate":"<http://xmlns.com/foaf/0.1/maker>","object":"_:art"},
+{"subject":"<http://www.w3.org/2001/sw/RDFCore/ntriples/>","predicate":"<http://xmlns.com/foaf/0.1/maker>","object":"_:dave"},
+{"subject":"_:art","predicate":"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>","object":"<http://xmlns.com/foaf/0.1/Person>"},
+{"subject":"_:art","predicate":"<http://xmlns.com/foaf/0.1/name>","object":"Art Barstow"},
+{"subject":"_:dave","predicate":"<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>","object":"<http://xmlns.com/foaf/0.1/Person>"},
+{"subject":"_:dave","predicate":"<http://xmlns.com/foaf/0.1/name>", "object":"Dave Beckett"}
+]

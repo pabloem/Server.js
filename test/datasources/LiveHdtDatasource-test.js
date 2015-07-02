@@ -5,6 +5,7 @@ var Datasource = require('../../lib/datasources/Datasource'),
 
 var exampleHdtFile = path.join(__dirname, '../assets/test.hdt'),
     exampleHdtFileWithBlanks = path.join(__dirname, '../assets/test-blank.hdt'),
+    blankFile = path.join(__dirname, '../assets/blank-file.hdt'),
     paramDic = { file: exampleHdtFile ,
                  workspace: 'test/assets/workspace/'};
 
@@ -81,14 +82,21 @@ describe('LiveHdtDatasource', function () {
       { object: 'http://example.org/s1',    limit: 10, features: { triplePattern: true, limit: true } },
       0, 0);
   });
-  describe('A LiveHdtDatasource instance with blank nodes and updates', function() {
+  describe('A LiveHdtDatasource instance with updates', function() {
     paramDic.addedTriplesDb = 'added.5';
     paramDic.removedTriplesDb = 'removed.5';
-    paramDic.file = exampleHdtFileWithBlanks;
+    paramDic.file = blankFile;
     var datasource = new LiveHdtDatasource(paramDic);
     after(function (done) { datasource.close(done); });
-    var addContent = asset('../test/assets/triples_file.nt'),
-        rmvContent = asset('../test/assets/basic-fragment.nt');
+    var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
+        rmvContent = [];
+    datasource.applyOperationList({added:addContent, removed:rmvContent},
+                                 function() {
+                                   datasource._auxiliary.added.get({},function(err,list) {
+                                       list.length.should.equal(8);
+                                       console.log(list);
+                                   });
+                                 });
   });
   describe('A LiveHdtDatasource instance with blank nodes', function () {
     paramDic.addedTriplesDb = 'added.6';
