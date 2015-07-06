@@ -5,7 +5,6 @@ var Datasource = require('../../lib/datasources/Datasource'),
 
 var exampleHdtFile = path.join(__dirname, '../assets/test.hdt'),
     exampleHdtFileWithBlanks = path.join(__dirname, '../assets/test-blank.hdt'),
-    blankFile = path.join(__dirname, '../assets/blank-file.hdt'),
     paramDic = { file: exampleHdtFile ,
                  workspace: 'test/assets/workspace/'};
 
@@ -85,8 +84,9 @@ describe('LiveHdtDatasource', function () {
   describe('A LiveHdtDatasource instance with updates', function() {
     paramDic.addedTriplesDb = 'added.5';
     paramDic.removedTriplesDb = 'removed.5';
-    paramDic.file = blankFile;
+    paramDic.file = exampleHdtFileWithBlanks;
     var datasource = new LiveHdtDatasource(paramDic);
+    it('should apply updates properly', function() {
     after(function (done) { datasource.close(done); });
     var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
         rmvContent = [];
@@ -94,9 +94,107 @@ describe('LiveHdtDatasource', function () {
                                  function() {
                                    datasource._auxiliary.added.get({},function(err,list) {
                                        list.length.should.equal(8);
-                                       console.log(list);
+                                       list[2].subject.should.equal('_:art');
                                    });
                                  });
+    itShouldExecute(datasource,
+      'the empty query',
+      { features: { triplePattern: true } },
+      14, 14,
+      [
+        { subject: 'genid:a', predicate: 'b', object: 'c1' },
+        { subject: 'genid:a', predicate: 'b', object: 'c2' },
+        { subject: 'genid:a', predicate: 'b', object: 'c3' },
+        { subject: 'a',       predicate: 'b', object: 'genid:c1' },
+        { subject: 'a',       predicate: 'b', object: 'genid:c2' },
+        { subject: 'a',       predicate: 'b', object: 'genid:c3' },
+        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+          predicate: '<http://purl.org/dc/terms/title>',
+          object: '"N-Triples"@en-US' },
+        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+          object: '<http://xmlns.com/foaf/0.1/Document>' },
+        { subject: 'genid:art',
+          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+          object: '<http://xmlns.com/foaf/0.1/Person>' },
+        { subject: 'genid:dave',
+          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+          object: '<http://xmlns.com/foaf/0.1/Person>' },
+        { subject: 'genid:art',
+          predicate: '<http://xmlns.com/foaf/0.1/name>',
+          object: 'Art Barstow' },
+        { subject: 'genid:dave',
+          predicate: '<http://xmlns.com/foaf/0.1/name>',
+          object: 'Dave Beckett' },
+        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+          predicate: '<http://xmlns.com/foaf/0.1/maker>',
+          object: 'genid:art' },
+        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+          predicate: '<http://xmlns.com/foaf/0.1/maker>',
+          object: 'genid:dave' }
+      ]);
+    });
+  });
+  describe('A LiveHdtDatasource instance with multiple updates', function() {
+    paramDic.addedTriplesDb = 'added.8';
+    paramDic.removedTriplesDb = 'removed.8';
+    paramDic.file = exampleHdtFileWithBlanks;
+    var datasource = new LiveHdtDatasource(paramDic);
+    it('should easily process removals from auxiliary databases', function() {
+        var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
+            rmvContent = [];
+        datasource.applyOperationList({added:addContent, removed:rmvContent},
+                                      function() {
+                                        datasource._auxiliary.added.get({},function(err,list) {
+                                          list.length.should.equal(8);
+                                          list[2].subject.should.equal('_:art');
+                                        });
+                                        addContent = [],
+                                        rmvContent = [{ subject: '_:art',
+                                                        predicate: '<http://xmlns.com/foaf/0.1/name>',
+                                                        object: 'Art Barstow' },
+                                                      { subject: '_:dave',
+                                                        predicate: '<http://xmlns.com/foaf/0.1/name>',
+                                                        object: 'Dave Beckett' }];
+                                        datasource.applyOperationList({added:addContent, removed:rmvContent},
+                                                                      function() {
+                                                                        datasource._auxiliary.added.get({},function(err,list) {
+                                                                        list.length.should.equal(6);
+                                                                        itShouldExecute(datasource,
+                                                                                        'the empty query',
+                                                                                        { features: { triplePattern: true } },
+                                                                                        12, 12,
+                                                                                        [
+                                                                                          { subject: 'genid:a', predicate: 'b', object: 'c1' },
+                                                                                          { subject: 'genid:a', predicate: 'b', object: 'c2' },
+                                                                                          { subject: 'genid:a', predicate: 'b', object: 'c3' },
+                                                                                          { subject: 'a',       predicate: 'b', object: 'genid:c1' },
+                                                                                          { subject: 'a',       predicate: 'b', object: 'genid:c2' },
+                                                                                          { subject: 'a',       predicate: 'b', object: 'genid:c3' },
+                                                                                          { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                                                                                            predicate: '<http://purl.org/dc/terms/title>',
+                                                                                            object: '"N-Triples"@en-US' },
+                                                                                          { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                                                                                            predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                                                                                            object: '<http://xmlns.com/foaf/0.1/Document>' },
+                                                                                          { subject: 'genid:art',
+                                                                                            predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                                                                                            object: '<http://xmlns.com/foaf/0.1/Person>' },
+                                                                                          { subject: 'genid:dave',
+                                                                                            predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                                                                                            object: '<http://xmlns.com/foaf/0.1/Person>' },
+                                                                                          { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                                                                                            predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                                                                                            object: 'genid:art' },
+                                                                                          { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                                                                                            predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                                                                                            object: 'genid:dave' }
+                                                                                        ]);
+                                                                        });
+                                                                      });
+                                      });
+        
+    });
   });
   describe('A LiveHdtDatasource instance with blank nodes', function () {
     paramDic.addedTriplesDb = 'added.6';
