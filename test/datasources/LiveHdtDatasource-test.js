@@ -8,6 +8,19 @@ var exampleHdtFile = path.join(__dirname, '../assets/test.hdt'),
     paramDic = { file: exampleHdtFile ,
                  workspace: 'test/assets/workspace/'};
 
+after(function(){
+    var databases = ['added.db','removed.db',
+                     'added.2','removed.2',
+                     'added.3','removed.3',
+                     'added.4','removed.4',
+                     'added.5','removed.5',
+                     'added.6','removed.6',
+                     'added.7','removed.7',
+                     'added.8','removed.8'];
+    for(var i = 0; i < databases.length ; i++) {
+        require('child_process').spawn('rm',['-Rv', path.join(paramDic.workspace,databases[i])]);
+    }
+});
 describe('LiveHdtDatasource', function () {
   describe('The LiveHdtDatasource module', function () {
     it('should be a function', function () {
