@@ -216,24 +216,43 @@ describe('LiveHdtDatasource', function () {
     paramDic.file = exampleHdtFile;
     var datasource = new LiveHdtDatasource(paramDic);
     it('should not show any removed triples, and show all added',function() {
-      var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
-          rmvContent = [ { subject: 'http://example.org/s1',
-                           predicate: 'http://example.org/p1',
-                           object: 'http://example.org/o001' },
-                         { subject: 'http://example.org/s2',
-                           predicate: 'http://example.org/p1',
-                           object: 'http://example.org/o001' },
-                         { subject: 'http://example.org/s1',
-                           predicate: 'http://example.org/p1',
-                           object: 'http://example.org/o002' },
-                         { subject: 'http://example.org/s2',
-                           predicate: 'http://example.org/p1',
-                           object: 'http://example.org/o002' }];
+      var HDTContents = JSON.parse(asset('../test/assets/testfile.json')),
+          addContent = [],
+          rmvContent = [],
+          notRemoved = [];
+
+      rmvContent = HDTContents.slice();
+      rmvContent.splice(110);
+      rmvContent.splice(40,60);
+      rmvContent.splice(2,18);
+
+      notRemoved = HDTContents.slice();
+      notRemoved.splice(100,10);
+      notRemoved.splice(20,20);
+      notRemoved.splice(0,2);
+
+      var testOffsetCache = function() {
+        // Should add function to test integrity of the OffsetCache
+      };
       var afterUpdates = function() {
+        itShouldExecute(datasource,
+                        'the empty query with a limit',
+                        { limit: 10, features: { triplePattern: true, limit: true } },
+                        10, 132,notRemoved.slice(0,10),testOffsetCache);
         itShouldExecute(datasource,
                         'the empty query',
                         { features: { triplePattern: true } },
-                        136, 136);
+                        100, 132,notRemoved,testOffsetCache);
+        /* ATTENTION - THIS QUERY TESTS CASE 0 
+           // TODO - ENABLE FOLLOWING QUERY
+        itShouldExecute(datasource,
+                        'the empty query with an offset',
+                        { offset: 10,limit:10, features: { triplePattern: true, offset: true } },
+                        10, 132, undefined,testOffsetCache);*/
+        itShouldExecute(datasource,
+                        'the empty query with a different offset',
+                        { offset: 30, features: { triplePattern: true, offset: true } },
+                        70, 132,notRemoved.slice(30),testOffsetCache);
       };
       datasource.applyOperationList({added:addContent, removed:rmvContent},afterUpdates);
     });
@@ -328,7 +347,7 @@ describe('LiveHdtDatasource', function () {
 });
 
 function itShouldExecute(datasource, name, query,
-                         expectedResultsCount, expectedTotalCount, expectedTriples) {
+                         expectedResultsCount, expectedTotalCount, expectedTriples,testCallback) {
   describe('executing ' + name, function () {
     var resultsCount = 0, totalCount, triples = [];
     before(function (done) {
@@ -351,6 +370,11 @@ function itShouldExecute(datasource, name, query,
         expect(triples.length).to.equal(expectedTriples.length);
         for (var i = 0; i < expectedTriples.length; i++)
           triples[i].should.deep.equal(expectedTriples[i]);
+      });
+    }
+    if(testCallback) {
+      it('should run a normal test callback',function() {
+        testCallback();
       });
     }
   });
