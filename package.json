@@ -14,7 +14,7 @@
     "url": "https://github.com/LinkedDataFragments/Server.js/issues"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha",
+    "test": "./node_modules/mocha/bin/mocha --timeout=1000",
     "hint": "./node_modules/jshint/bin/jshint bin/* lib test"
   },
   "dependencies": {
