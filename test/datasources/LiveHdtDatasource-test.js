@@ -16,7 +16,8 @@ after(function(){
                      'added.5','removed.5',
                      'added.6','removed.6',
                      'added.7','removed.7',
-                     'added.8','removed.8'];
+                     'added.8','removed.8',
+                     'added.9','removed.9'];
     for(var i = 0; i < databases.length ; i++) {
         require('child_process').spawn('rm',['-Rv', path.join(paramDic.workspace,databases[i])]);
     }
@@ -62,7 +63,7 @@ describe('LiveHdtDatasource', function () {
     itShouldExecute(datasource,
       'the empty query with an offset',
       { offset: 10, features: { triplePattern: true, offset: true } },
-      123, 132);
+      122, 132);
 
     itShouldExecute(datasource,
       'a query for an existing subject',
@@ -148,7 +149,7 @@ describe('LiveHdtDatasource', function () {
       ]);
     });
   });
-  describe('A LiveHdtDatasource instance with multiple updates', function() {
+  describe('A LiveHdtDatasource instance with updates to auxiliary databases', function() {
     paramDic.addedTriplesDb = 'added.8';
     paramDic.removedTriplesDb = 'removed.8';
     paramDic.file = exampleHdtFileWithBlanks;
@@ -209,9 +210,38 @@ describe('LiveHdtDatasource', function () {
         
     });
   });
+  describe('A LiveHdtDatasource instance with updates to its HDT database', function() {
+    paramDic.addedTriplesDb = 'added.9';
+    paramDic.removedTriplesDb = 'removed.9';
+    paramDic.file = exampleHdtFile;
+    var datasource = new LiveHdtDatasource(paramDic);
+    it('should not show any removed triples, and show all added',function() {
+      var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
+          rmvContent = [ { subject: 'http://example.org/s1',
+                           predicate: 'http://example.org/p1',
+                           object: 'http://example.org/o001' },
+                         { subject: 'http://example.org/s2',
+                           predicate: 'http://example.org/p1',
+                           object: 'http://example.org/o001' },
+                         { subject: 'http://example.org/s1',
+                           predicate: 'http://example.org/p1',
+                           object: 'http://example.org/o002' },
+                         { subject: 'http://example.org/s2',
+                           predicate: 'http://example.org/p1',
+                           object: 'http://example.org/o002' }];
+      var afterUpdates = function() {
+        itShouldExecute(datasource,
+                        'the empty query',
+                        { features: { triplePattern: true } },
+                        136, 136);
+      };
+      datasource.applyOperationList({added:addContent, removed:rmvContent},afterUpdates);
+    });
+  });
   describe('A LiveHdtDatasource instance with blank nodes', function () {
     paramDic.addedTriplesDb = 'added.6';
     paramDic.removedTriplesDb = 'removed.6';
+    paramDic.file = exampleHdtFileWithBlanks;
     var datasource = new LiveHdtDatasource(paramDic);
     after(function (done) { datasource.close(done); });
 
@@ -312,9 +342,9 @@ function itShouldExecute(datasource, name, query,
       expect(resultsCount).to.equal(expectedResultsCount);
     });
 
-    /*it('should emit the expected total number of triples', function () {
+    it('should emit the expected total number of triples', function () {
       expect(totalCount).to.equal(expectedTotalCount);
-    });*/
+    });
 
     if (expectedTriples) {
       it('should emit the expected triples', function () {
