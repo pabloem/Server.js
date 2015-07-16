@@ -95,68 +95,69 @@ describe('LiveHdtDatasource', function () {
       { object: 'http://example.org/s1',    limit: 10, features: { triplePattern: true, limit: true } },
       0, 0);
   });
-  describe('A LiveHdtDatasource instance with updates', function() {
+  describe('A LiveHdtDatasource instance with additions', function() {
     paramDic.addedTriplesDb = 'added.5';
     paramDic.removedTriplesDb = 'removed.5';
     paramDic.file = exampleHdtFileWithBlanks;
     var datasource = new LiveHdtDatasource(paramDic);
-    it('should apply updates properly', function() {
-    after(function (done) { datasource.close(done); });
-    var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
-        rmvContent = [];
-    datasource.applyOperationList({added:addContent, removed:rmvContent},
-                                 function() {
-                                   datasource._auxiliary.added.get({},function(err,list) {
-                                       list.length.should.equal(8);
-                                       list[2].subject.should.equal('_:art');
-                                   });
-                                 });
-    itShouldExecute(datasource,
-      'the empty query',
-      { features: { triplePattern: true } },
-      14, 14,
-      [
-        { subject: 'genid:a', predicate: 'b', object: 'c1' },
-        { subject: 'genid:a', predicate: 'b', object: 'c2' },
-        { subject: 'genid:a', predicate: 'b', object: 'c3' },
-        { subject: 'a',       predicate: 'b', object: 'genid:c1' },
-        { subject: 'a',       predicate: 'b', object: 'genid:c2' },
-        { subject: 'a',       predicate: 'b', object: 'genid:c3' },
-        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-          predicate: '<http://purl.org/dc/terms/title>',
-          object: '"N-Triples"@en-US' },
-        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-          object: '<http://xmlns.com/foaf/0.1/Document>' },
-        { subject: 'genid:art',
-          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-          object: '<http://xmlns.com/foaf/0.1/Person>' },
-        { subject: 'genid:dave',
-          predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-          object: '<http://xmlns.com/foaf/0.1/Person>' },
-        { subject: 'genid:art',
-          predicate: '<http://xmlns.com/foaf/0.1/name>',
-          object: 'Art Barstow' },
-        { subject: 'genid:dave',
-          predicate: '<http://xmlns.com/foaf/0.1/name>',
-          object: 'Dave Beckett' },
-        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-          predicate: '<http://xmlns.com/foaf/0.1/maker>',
-          object: 'genid:art' },
-        { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-          predicate: '<http://xmlns.com/foaf/0.1/maker>',
-          object: 'genid:dave' }
-      ]);
+    before('it should first apply its updates', function(done) {
+      var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
+      rmvContent = [];
+      datasource.applyOperationList({added:addContent, removed:rmvContent},
+                                    function() {
+                                      datasource._auxiliary.added.get({},function(err,list) {
+                                        list.length.should.equal(8);
+                                        list[2].subject.should.equal('_:art');
+                                      });
+                                      done();
+                                    });
     });
+    after(function (done) { datasource.close(done); });
+    itShouldExecute(datasource,
+                    'the empty query',
+                    { features: { triplePattern: true } },
+                    14, 14,
+                    [
+                      { subject: 'genid:a', predicate: 'b', object: 'c1' },
+                      { subject: 'genid:a', predicate: 'b', object: 'c2' },
+                      { subject: 'genid:a', predicate: 'b', object: 'c3' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c1' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c2' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c3' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://purl.org/dc/terms/title>',
+                        object: '"N-Triples"@en-US' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Document>' },
+                      { subject: 'genid:art',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Person>' },
+                      { subject: 'genid:dave',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Person>' },
+                      { subject: 'genid:art',
+                        predicate: '<http://xmlns.com/foaf/0.1/name>',
+                        object: 'Art Barstow' },
+                      { subject: 'genid:dave',
+                        predicate: '<http://xmlns.com/foaf/0.1/name>',
+                        object: 'Dave Beckett' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                        object: 'genid:art' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                        object: 'genid:dave' }
+                    ]);
   });
-  describe('A LiveHdtDatasource instance with updates to auxiliary databases', function() {
+  describe('A LiveHdtDatasource instance with successive updates to auxiliary databases', function() {
     paramDic.addedTriplesDb = 'added.8';
     paramDic.removedTriplesDb = 'removed.8';
     paramDic.file = exampleHdtFileWithBlanks;
     var datasource = new LiveHdtDatasource(paramDic);
-    it('should easily process removals from auxiliary databases', function() {
-      var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
-      rmvContent = [];
+    var addContent = JSON.parse(asset('../test/assets/triples_file.json')),
+        rmvContent = [];
+    before('it should apply its updates first', function(done){
       datasource.applyOperationList(
         {added:addContent, removed:rmvContent},
         function() {
@@ -176,88 +177,109 @@ describe('LiveHdtDatasource', function () {
             function() {
               datasource._auxiliary.added.get({},function(err,list) {
                 list.length.should.equal(6);
-                itShouldExecute(datasource,
-                                'the empty query',
-                                { features: { triplePattern: true } },
-                                12, 12,
-                                [
-                                  { subject: 'genid:a', predicate: 'b', object: 'c1' },
-                                  { subject: 'genid:a', predicate: 'b', object: 'c2' },
-                                  { subject: 'genid:a', predicate: 'b', object: 'c3' },
-                                  { subject: 'a',       predicate: 'b', object: 'genid:c1' },
-                                  { subject: 'a',       predicate: 'b', object: 'genid:c2' },
-                                  { subject: 'a',       predicate: 'b', object: 'genid:c3' },
-                                  { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-                                    predicate: '<http://purl.org/dc/terms/title>',
-                                    object: '"N-Triples"@en-US' },
-                                  { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-                                    predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-                                    object: '<http://xmlns.com/foaf/0.1/Document>' },
-                                  { subject: 'genid:art',
-                                    predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-                                    object: '<http://xmlns.com/foaf/0.1/Person>' },
-                                  { subject: 'genid:dave',
-                                    predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
-                                    object: '<http://xmlns.com/foaf/0.1/Person>' },
-                                  { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-                                    predicate: '<http://xmlns.com/foaf/0.1/maker>',
-                                    object: 'genid:art' },
-                                  { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
-                                    predicate: '<http://xmlns.com/foaf/0.1/maker>',
-                                    object: 'genid:dave' }
-                                ]);
               });
+              done();
             });
         });
-      
     });
+    itShouldExecute(datasource,
+                    'the empty query',
+                    { features: { triplePattern: true } },
+                    12, 12,
+                    [
+                      { subject: 'genid:a', predicate: 'b', object: 'c1' },
+                      { subject: 'genid:a', predicate: 'b', object: 'c2' },
+                      { subject: 'genid:a', predicate: 'b', object: 'c3' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c1' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c2' },
+                      { subject: 'a',       predicate: 'b', object: 'genid:c3' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://purl.org/dc/terms/title>',
+                        object: '"N-Triples"@en-US' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Document>' },
+                      { subject: 'genid:art',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Person>' },
+                      { subject: 'genid:dave',
+                        predicate: '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                        object: '<http://xmlns.com/foaf/0.1/Person>' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                        object: 'genid:art' },
+                      { subject: '<http://www.w3.org/2001/sw/RDFCore/ntriples/>',
+                        predicate: '<http://xmlns.com/foaf/0.1/maker>',
+                        object: 'genid:dave' }
+                    ]);
   });
   describe('A LiveHdtDatasource instance with updates to its HDT database', function() {
     paramDic.addedTriplesDb = 'added.9';
     paramDic.removedTriplesDb = 'removed.9';
     paramDic.file = exampleHdtFile;
     var datasource = new LiveHdtDatasource(paramDic);
-    it('should not show any removed triples, and show all added',function() {
-      var HDTContents = JSON.parse(asset('../test/assets/testfile.json')),
-          addContent = [],
-          rmvContent = [],
-          notRemoved = [];
+    var HDTContents = JSON.parse(asset('../test/assets/testfile.json')),
+        addContent = [],
+        rmvContent = [],
+        notRemoved = [];
 
-      rmvContent = HDTContents.slice();
-      rmvContent.splice(110);
-      rmvContent.splice(40,60);
-      rmvContent.splice(2,18);
+    rmvContent = HDTContents.slice();
+    rmvContent.splice(110);
+    rmvContent.splice(40,60);
+    rmvContent.splice(2,18);
 
-      notRemoved = HDTContents.slice();
-      notRemoved.splice(100,10);
-      notRemoved.splice(20,20);
-      notRemoved.splice(0,2);
-
-      var testOffsetCache = function() {
-        // Should add function to test integrity of the OffsetCache
-      };
-      var afterUpdates = function() {
-        itShouldExecute(datasource,
-                        'the empty query with a limit',
-                        { limit: 10, features: { triplePattern: true, limit: true } },
-                        10, 132,notRemoved.slice(0,10),testOffsetCache);
-        itShouldExecute(datasource,
-                        'the empty query',
-                        { features: { triplePattern: true } },
-                        100, 132,notRemoved,testOffsetCache);
-        /* IMPORTANT This query tests case 0 */
-        itShouldExecute(datasource,
-                        'the empty query with an offset',
-                        { offset: 10,limit:10, features: { triplePattern: true, offset: true } },
-                        10, 132, notRemoved.slice(10,20),testOffsetCache);
-        // TODO - add more of these queries
-        itShouldExecute(datasource,
-                        'the empty query with a different offset',
-                        { offset: 30, features: { triplePattern: true, offset: true } },
-                        70, 132,notRemoved.slice(30),testOffsetCache);
-      };
-      datasource.applyOperationList({added:addContent, removed:rmvContent},afterUpdates);
+    notRemoved = HDTContents.slice();
+    notRemoved.splice(100,10);
+    notRemoved.splice(20,20);
+    notRemoved.splice(0,2);
+    before('it will first apply its updates', function(done) {
+      datasource.applyOperationList({added:addContent, removed:rmvContent},done);
     });
+
+    var testOffsetCache = function() {
+      // Should add function to test integrity of the OffsetCache
+    };
+    itShouldExecute(datasource,
+                    'the empty query with a limit',
+                    { limit: 10, features: { triplePattern: true, limit: true } },
+                    10, 132,notRemoved.slice(0,10),testOffsetCache);
+    itShouldExecute(datasource,
+                    'the empty query',
+                    { features: { triplePattern: true } },
+                    100, 132,notRemoved,testOffsetCache);
+    /* IMPORTANT This query tests case 0 */
+    itShouldExecute(datasource,
+                    'the empty query with an offset',
+                    { offset: 10,limit:10, features: { triplePattern: true, offset: true } },
+                    10, 132, notRemoved.slice(10,20),testOffsetCache);
+    // This query tests case 0 - in fact, the result is the same as the previous
+    itShouldExecute(datasource,
+                    'a query for an existing predicate',
+                    { predicate: 'http://example.org/p1', offset: 10, limit: 10, features: { triplePattern: true, limit: true } },
+                    10, 30, notRemoved.slice(10,20));
+    itShouldExecute(datasource,
+                    'the empty query with a different offset',
+                    { offset: 30, features: { triplePattern: true, offset: true } },
+                    70, 132,notRemoved.slice(30),testOffsetCache);
+    itShouldExecute(datasource,
+                    'a query for an existing subject - with offset and limit',
+                    { subject: 'http://example.org/s1', offset: 1,limit: 10,features: { triplePattern: true, limit: true } },
+                    10, 100,notRemoved.slice(1,11));
+                    // NOTE: For this test, we can just sliced the notRemoved list, because the first 11 non-removed
+                    //       elements have http://example.org/s1 for subject.
+    itShouldExecute(datasource,
+                    'a query for an existing predicate',
+                    { predicate: 'http://example.org/p1', offset: 2, limit: 10, features: { triplePattern: true, limit: true } },
+                    10, 22, notRemoved.slice(2,12));
+                    // NOTE: For this test, we can just sliced the notRemoved list, because the first 12 non-removed
+                    //       elements have http://example.org/p1 for predicate.
+    itShouldExecute(datasource,
+                    'a query for an existing object',
+                    { object: 'http://example.org/o001',  limit: 10, features: { triplePattern: true, limit: true } },
+                    1, 3, // The only non-removed triple with http://example.org/o001 for object.
+                    [{"subject": "http://example.org/s3",
+                      "predicate": "http://example.org/p2",
+                      "object": "http://example.org/o001" }]);
   });
   describe('A LiveHdtDatasource instance with blank nodes', function () {
     paramDic.addedTriplesDb = 'added.6';
