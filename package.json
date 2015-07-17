@@ -31,7 +31,8 @@
     "levelgraph": "1.0.0",
     "uritemplate": "^0.3.0",
     "htmlparser2": "^3.8.2",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "bloem": "^0.2.4"
   },
   "optionalDependencies": {
     "hdt": "^1.1.0",
