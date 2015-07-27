@@ -11,8 +11,8 @@
                     "pollingInterval":5,
                     "latestChangeset":"2015/07/20/00",
                     "regeneratingInterval":1440,
-                    "hour_step":10,
-                    "changesetThreshold":100
+                    "hour_step":100,
+                    "changesetThreshold":200
                   }
     }
     },
