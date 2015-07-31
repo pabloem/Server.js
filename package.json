@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha --timeout=1000",
-    "hint": "./node_modules/jshint/bin/jshint bin/* lib test"
+    "hint": "./node_modules/jshint/bin/jshint bin/ldf-server lib test"
   },
   "dependencies": {
     "qejs": "^3.0.0",
