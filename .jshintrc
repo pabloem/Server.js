@@ -14,6 +14,7 @@
     "describe": true,
     "before": true,
     "after": true,
+    "afterEach": true,
     "expect": true,
     "sinon": true,
     "test": true

@@ -1,28 +1,23 @@
 var Datasource = require('../../lib/datasources/Datasource'),
     LiveHdtDatasource = require('../../lib/datasources/LiveHdtDatasource'),
     path = require('path'),
-    fs = require('fs');
+    fs = require('fs'),
+    ChildProcess = require('child_process');
 
 var exampleHdtFile = path.join(__dirname, '../assets/test.hdt'),
     exampleHdtFileWithBlanks = path.join(__dirname, '../assets/test-blank.hdt'),
     paramDic = { file: exampleHdtFile ,
                  workspace: 'test/assets/workspace/'};
-
 after(function(){
-    var databases = ['added.db','removed.db',
-                     'added.2','removed.2',
-                     'added.3','removed.3',
-                     'added.4','removed.4',
-                     'added.5','removed.5',
-                     'added.6','removed.6',
-                     'added.7','removed.7',
-                     'added.8','removed.8',
-                     'added.9','removed.9'];
-    for(var i = 0; i < databases.length ; i++) {
-        require('child_process').spawn('rm',['-Rv', path.join(paramDic.workspace,databases[i])]);
-    }
+  // Removing all the databases
+  ChildProcess.exec('rm -r '+path.join(paramDic.workspace,'added*'));
+  ChildProcess.exec('rm -r '+path.join(paramDic.workspace,'removed*'));
 });
 describe('LiveHdtDatasource', function () {
+  afterEach(function(done) {
+    var p = ChildProcess.spawn('rm',['-f','hdtFileLocation.txt','addedDbLocation.txt','removedDbLocation.txt']);
+    p.on('exit',function(){done();});
+  });
   describe('The LiveHdtDatasource module', function () {
     it('should be a function', function () {
       LiveHdtDatasource.should.be.a('function');
@@ -164,22 +159,22 @@ describe('LiveHdtDatasource', function () {
           datasource._auxiliary.added.get({},function(err,list) {
             list.length.should.equal(8);
             list[2].subject.should.equal('_:art');
-          });
-          addContent = [],
-          rmvContent = [{ subject: '_:art',
-                          predicate: '<http://xmlns.com/foaf/0.1/name>',
-                          object: 'Art Barstow' },
-                        { subject: '_:dave',
-                          predicate: '<http://xmlns.com/foaf/0.1/name>',
-                          object: 'Dave Beckett' }];
-          datasource.applyOperationList(
-            {added:addContent, removed:rmvContent},
-            function() {
-              datasource._auxiliary.added.get({},function(err,list) {
-                list.length.should.equal(6);
+            addContent = [],
+            rmvContent = [{ subject: '_:art',
+                            predicate: '<http://xmlns.com/foaf/0.1/name>',
+                            object: 'Art Barstow' },
+                          { subject: '_:dave',
+                            predicate: '<http://xmlns.com/foaf/0.1/name>',
+                            object: 'Dave Beckett' }];
+            datasource.applyOperationList(
+              {added:addContent, removed:rmvContent},
+              function() {
+                datasource._auxiliary.added.get({},function(err,lst) {
+                  lst.length.should.equal(6);
+                });
+                done();
               });
-              done();
-            });
+          });
         });
     });
     itShouldExecute(datasource,
