@@ -21,12 +21,38 @@ var configFile = args[0],
     port = parseInt(args[1], 10) || 3000,
     workers = parseInt(args[2], 10) || 1;
 
+var awaitedResponses = 0,
+    receivedResponses = 0;
+function messageChildren(message) {
+  if(message.source == 1) {
+    receivedResponses = 0; awaitedResponses = 0;
+    for(var id in cluster.workers) {
+      if(id == 1) continue;
+      cluster.workers[id].send(message);
+      awaitedResponses += 1;
+    }
+    if(awaitedResponses === 0) { // This means that they are BOTH 0
+      cluster.workers[1].send({type: 'done', done: true});
+    }
+  } else {
+    receivedResponses += 1;
+    if(receivedResponses == awaitedResponses) {
+      cluster.workers[1].send({type: 'done', done: true});
+      receivedResponses = 0;
+      awaitedResponses = 0;
+    }
+  }
+}
+
 // Start up a cluster master
 if (cluster.isMaster) {
   // Create workers
+  var worker;
   console.log('Master %d running.', process.pid);
-  for (var i = 0; i < workers; i++)
-    cluster.fork();
+  for (var i = 0; i < workers; i++) {
+    worker = cluster.fork();
+    worker.on('message',messageChildren);
+  }
 
   // Respawn crashed workers
   cluster.on('listening', function (worker) {
@@ -34,7 +60,8 @@ if (cluster.isMaster) {
       if (!worker.suicide) {
         console.log('Worker %d died with %s. Starting new worker.',
                     worker.process.pid, code || signal);
-        cluster.fork();
+        var proc = cluster.fork();
+        proc.on('message',messageChildren);
       }
     });
   });
@@ -52,6 +79,7 @@ if (cluster.isMaster) {
       if (workers.length) {
         // Wait until the new worker starts listening to kill the old one
         var newWorker = cluster.fork();
+        newWorker.on('message',messageChildren);
         newWorker.once('listening', function () {
           var worker = workers.pop();
           if (!worker)
