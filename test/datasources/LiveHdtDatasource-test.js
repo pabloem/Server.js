@@ -15,7 +15,10 @@ after(function(){
 });
 describe('LiveHdtDatasource', function () {
   afterEach(function(done) {
-    var p = ChildProcess.spawn('rm',['-f','hdtFileLocation.txt','addedDbLocation.txt','removedDbLocation.txt']);
+    var p = ChildProcess.spawn('rm',['-f',
+                                     paramDic.workspace+'hdtFileLocation.txt',
+                                     paramDic.workspace+'addedDbLocation.txt',
+                                     paramDic.workspace+'removedDbLocation.txt']);
     p.on('exit',function(){done();});
   });
   describe('The LiveHdtDatasource module', function () {
