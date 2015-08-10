@@ -122,9 +122,14 @@ A LiveHdtDatasource requires the following settings to be configured to run prop
 * `regeneratingInterval` - This is the period, in minutes, between each time the HDT is regenerated.
 * `file` - This is the HDT file containing the data. The `LiveHdtDatasource` will ignore, and delete the file once a new HDT file has been generated.
 * `workspace` - This is the workspace directory where the `LiveHdtDatasource` manages its data. The directory must exist.
-* `latestChangeset` - This is the latest changeset that has been added to the HDT file, written as 'Year/Month/Day/Number'. It's very important to add this information.
-* `addedTriplesDb`/`removedTriplesDb` - These are the added/removed triples databases. It defaults to 'added.db', and 'removed.db' within the workspace.
+* `latestChangeset` - This is the latest changeset that has been added to the HDT file, written as 'Year/Month/Day/Number'. Once the `LiveHdtDatasource` has started
+polling and applying changesets on it's own, it will ignore this parameter. Nonetheless, it's very important to add this information on first startup.
+* `addedTriplesDb`/`removedTriplesDb` - These are the added/removed triples databases. It defaults to 'added.db', and 'removed.db' within the workspace. - It is recommended to leave this property unset.
 * `regeneratorScript` - This is the script that regenerates the HDT file. It defaults to `./consolidate.sh` in the `bin/` directory.
+* `changesetThreshold` - This is the maximum number of changesets to be applied on a single apply cycle. If more than this number of
+changesets is retrieved, they will be applied in several cycles. Default is 500.
+* `hourStep` - This is the maximum number of hours to try to download at once. This generally does not matter, since the `pollingInterval`
+is smaller, but when we need to update the HDT file, this limit will play a role. Default is 25.
 
 The default regenerator script uses the [hdt-iris](http://github.com/pabloem/hdt-iris), so it is recommended to
 install it, and add its appropriate location in the `bin/consolidate.sh` file.
