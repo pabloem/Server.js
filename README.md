@@ -103,6 +103,32 @@ it will reload by replacing its workers.
 
 Note that crashed or killed workers are always replaced automatically.
 
+### Using the `LiveHdtDatasource`
+The `LiveHdtDatasource` was developed by [Pablo Estrada](http://github.com/pabloem/) as part of a project for
+the Google Summer of Code of 2015. This datasource allows the Linked Data Fragments Server to keep an updated
+version of the DBPedia, while still being scalable.
+
+The `LiveHdtDatasource` used an HDT file as data source. It periodically polls the [DBPedia Live Feed](http://live.dbpedia.org/changesets/)
+for updates to the DBPedia dataset. When there are new updates, it downloads them and inserts them in
+temporary databases; which are used along with the base HDT file. Then, it periodically generates a new HDT
+file, that incorporates the changesetss it had downloaded previously.
+
+The `LiveHdtDatasource` requires a 'workspace' directory for its temporary databases, and the newly generated
+HDT files. It is recommended that after first initialization, the `LiveHdtDatasource` is allowed to
+manage its workspace independently.
+
+A LiveHdtDatasource requires the following settings to be configured to run properly:
+* `pollingInterval` - This is the period, in minutes, between each polling for new changesets in the DBPecia Live Feed.
+* `regeneratingInterval` - This is the period, in minutes, between each time the HDT is regenerated.
+* `file` - This is the HDT file containing the data. The `LiveHdtDatasource` will ignore, and delete the file once a new HDT file has been generated.
+* `workspace` - This is the workspace directory where the `LiveHdtDatasource` manages its data. The directory must exist.
+* `latestChangeset` - This is the latest changeset that has been added to the HDT file, written as 'Year/Month/Day/Number'. It's very important to add this information.
+* `addedTriplesDb`/`removedTriplesDb` - These are the added/removed triples databases. It defaults to 'added.db', and 'removed.db' within the workspace.
+* `regeneratorScript` - This is the script that regenerates the HDT file. It defaults to `./consolidate.sh` in the `bin/` directory.
+
+The default regenerator script uses the [hdt-iris](http://github.com/pabloem/hdt-iris), so it is recommended to
+install it, and add its appropriate location in the `bin/consolidate.sh` file.
+
 ### _(Optional)_ Set up a reverse proxy
 
 A typical Linked Data Fragments server will be exposed
