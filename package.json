@@ -32,7 +32,8 @@
     "uritemplate": "^0.3.0",
     "htmlparser2": "^3.8.2",
     "zlib": "^1.0.5",
-    "bloem": "^0.2.4"
+    "bloem": "^0.2.4",
+    "log4js":"^0.6"
   },
   "optionalDependencies": {
     "hdt": "^1.1.0",

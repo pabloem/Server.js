@@ -1,6 +1,9 @@
 var URL = require('url'),
     Readable = require('stream').Readable,
-    Writable = require('stream').Writable;
+    Writable = require('stream').Writable,
+    log4js = require('log4js');
+
+log4js.setGlobalLogLevel('WARN');
 
 // Set up the sinon stubbing library
 var sinon = global.sinon = require('sinon');
