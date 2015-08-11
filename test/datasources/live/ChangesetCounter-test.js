@@ -24,35 +24,35 @@ describe('ChangesetCounter', function() {
         });
         it('if created without arguments, it should be of the current time', function() {
             var nums = cc.getPath().split("/");
-            date.getFullYear().should.equal(parseInt(nums[0]));
-            (date.getMonth()+1).should.equal(parseInt(nums[1]));
-            date.getDate().should.equal(parseInt(nums[2]));
-            date.getHours().should.equal(parseInt(nums[3]));
+            date.getUTCFullYear().should.equal(parseInt(nums[0]));
+            (date.getUTCMonth()+1).should.equal(parseInt(nums[1]));
+            date.getUTCDate().should.equal(parseInt(nums[2]));
+            date.getUTCHours().should.equal(parseInt(nums[3]));
             (0).should.equal(parseInt(nums[4]));
         });
         it('should increment count properly', function() {
             cc.nextChangeset();
             var nums = cc.getPath().split("/");
-            date.getFullYear().should.equal(parseInt(nums[0]));
-            (date.getMonth()+1).should.equal(parseInt(nums[1]));
-            date.getDate().should.equal(parseInt(nums[2]));
-            date.getHours().should.equal(parseInt(nums[3]));
+            date.getUTCFullYear().should.equal(parseInt(nums[0]));
+            (date.getUTCMonth()+1).should.equal(parseInt(nums[1]));
+            date.getUTCDate().should.equal(parseInt(nums[2]));
+            date.getUTCHours().should.equal(parseInt(nums[3]));
             (1).should.equal(parseInt(nums[4]));
         });
         it('should reset count after incrementing hour', function() {
             cc.nextHour();
-            date.setHours(date.getHours()+1);
+            date.setUTCHours(date.getUTCHours()+1);
             var nums = cc.getPath().split("/");
             (0).should.equal(parseInt(nums[4]));
         });
         it('should increment hour consistently with calendar', function() {
             cc.nextHour();
-            date.setHours(date.getHours()+1);
+            date.setUTCHours(date.getUTCHours()+1);
             var nums = cc.getPath().split("/");
-            date.getFullYear().should.equal(parseInt(nums[0]));
-            (date.getMonth()+1).should.equal(parseInt(nums[1]));
-            date.getDate().should.equal(parseInt(nums[2]));
-            date.getHours().should.equal(parseInt(nums[3]));
+            date.getUTCFullYear().should.equal(parseInt(nums[0]));
+            (date.getUTCMonth()+1).should.equal(parseInt(nums[1]));
+            date.getUTCDate().should.equal(parseInt(nums[2]));
+            date.getUTCHours().should.equal(parseInt(nums[3]));
             (0).should.equal(parseInt(nums[4]));
         });
         it('should set count freely', function() {
