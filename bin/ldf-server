@@ -28,28 +28,29 @@ var configFile = args[0],
     port = parseInt(args[1], 10) || 3000,
     workers = parseInt(args[2], 10) || 1;
 
+var pollingWorker = 1;
 var awaitedResponses = 0,
     receivedResponses = 0;
 function messageChildren(message) {
   logger.info("Received message from worker "+message.source);
   logger.debug("Message is: "+JSON.stringify(message));
-  if(message.source == 1) {
+  if(message.source == pollingWorker) {
     receivedResponses = 0; awaitedResponses = 0;
     for(var id in cluster.workers) {
-      if(id == 1) continue;
+      if(id == pollingWorker) continue;
       logger.info("Sending message to worker "+id);
       cluster.workers[id].send(message);
       awaitedResponses += 1;
     }
     if(awaitedResponses === 0) { // This means that they are BOTH 0 (awaited and received)
       logger.info("Sending DONE message to woker 1");
-      cluster.workers[1].send({type: 'done', done: true});
+      cluster.workers[pollingWorker].send({type: 'done', done: true});
     }
   } else {
     receivedResponses += 1;
     if(receivedResponses == awaitedResponses) {
       logger.info("Sending DONE message to woker 1");
-      cluster.workers[1].send({type: 'done', done: true});
+      cluster.workers[pollingWorker].send({type: 'done', done: true});
       receivedResponses = 0;
       awaitedResponses = 0;
     }
@@ -69,11 +70,17 @@ if (cluster.isMaster) {
   // Respawn crashed workers
   cluster.on('listening', function (worker) {
     worker.once('exit', function (code, signal) {
+      var proc;
       if (!worker.suicide) {
         console.log('Worker %d died with %s. Starting new worker.',
                     worker.process.pid, code || signal);
-        var proc = cluster.fork();
+        proc = cluster.fork();
         proc.on('message',messageChildren);
+      }
+      if(worker.id == pollingWorker) {
+        log4js.error("The polling wokrer has died. Respawning.");
+        pollingWorker = proc.id;
+        proc.send({type:'startPolling'});
       }
     });
   });
