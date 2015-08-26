@@ -78,7 +78,7 @@ if (cluster.isMaster) {
         proc.on('message',messageChildren);
       }
       if(worker.id == pollingWorker) {
-        log4js.error("The polling wokrer has died. Respawning.");
+        logger.error("The polling wokrer has died. Respawning.");
         pollingWorker = proc.id;
         proc.send({type:'startPolling'});
       }

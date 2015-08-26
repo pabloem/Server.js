@@ -8,7 +8,7 @@
       "description": "DBpedia 2015 with a live HDT back-end",
       "settings": { "file": "data/dbpedia2015.hdt",
                     "workspace":"data/workspace/",
-                    "pollingInterval":5,
+                    "pollingInterval":60,
                     "latestChangeset":"2015/07/20/00",
                     "regeneratingInterval":1440,
                     "hour_step":100,
